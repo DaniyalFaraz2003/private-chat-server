@@ -1,0 +1,69 @@
+# --- OS ---
+.DS_Store
+
+# --- Dependencies ---
+*/node_modules/
+.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# --- Environment & secrets (never commit) ---
+.env
+.env.local
+.env.*.local
+
+# --- Logs & debug ---
+logs/
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# --- Test coverage ---
+coverage/
+*.lcov
+
+# --- Build output ---
+*/.next/
+*/out/
+*/dist/
+*/build/
+*/web-build/
+*.tgz
+
+# --- TypeScript / tooling caches ---
+*.tsbuildinfo
+.eslintcache
+.cache
+
+# --- IDE ---
+.idea/
+
+# --- TLS / signing keys ---
+*.pem
+*.jks
+*.p8
+*.p12
+*.key
+*.mobileprovision
+*.orig.*
+
+# --- Server (SQLite) ---
+server/data/
+
+# --- Web (Next.js) ---
+.vercel
+
+# --- Mobile (Expo / React Native) ---
+*/.expo/
+*/.kotlin/
+*/.metro-health-check*
+/mobile/ios/
+/mobile/android/
+/mobile/expo-env.d.ts
