@@ -5,6 +5,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 
 import LoginForm from "@/components/LoginForm";
 import { getToken } from "@/lib/auth-storage";
+import { theme } from "@/lib/theme";
 
 export default function LoginScreen() {
   const router = useRouter();
@@ -23,14 +24,15 @@ export default function LoginScreen() {
   if (checkingSession) {
     return (
       <SafeAreaView style={styles.container}>
-        <ActivityIndicator size="large" color="#18181b" />
+        <ActivityIndicator size="large" color={theme.primary} />
       </SafeAreaView>
     );
   }
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.content}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right", "bottom"]}>
+      <View style={styles.gridOverlay} />
+      <View style={styles.main}>
         <LoginForm onSuccess={() => router.replace("/chat")} />
       </View>
     </SafeAreaView>
@@ -40,13 +42,17 @@ export default function LoginScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fafafa",
+    backgroundColor: theme.background,
+  },
+  gridOverlay: {
+    ...StyleSheet.absoluteFill,
+    opacity: 0.08,
+    backgroundColor: "#2a3142",
+  },
+  main: {
+    flex: 1,
     alignItems: "center",
     justifyContent: "center",
-    padding: 16,
-  },
-  content: {
-    width: "100%",
-    alignItems: "center",
+    paddingHorizontal: 16,
   },
 });

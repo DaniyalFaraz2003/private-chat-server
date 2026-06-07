@@ -76,8 +76,8 @@ export default function ChatRoom() {
   }
 
   return (
-    <div className="flex h-full min-h-screen flex-col bg-zinc-50 dark:bg-black">
-      <header className="flex items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="flex h-screen flex-col overflow-hidden bg-zinc-50 dark:bg-black">
+      <header className="flex shrink-0 items-center justify-between border-b border-zinc-200 bg-white px-4 py-3 dark:border-zinc-800 dark:bg-zinc-950">
         <div>
           <h1 className="text-lg font-semibold text-zinc-900 dark:text-zinc-50">Private Chat</h1>
           {username ? (
@@ -93,7 +93,7 @@ export default function ChatRoom() {
         </button>
       </header>
 
-      <main className="mx-auto flex h-[calc(100vh-65px)] w-full max-w-3xl flex-1 flex-col border-x border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
+      <main className="mx-auto flex min-h-0 w-full max-w-3xl flex-1 flex-col border-x border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-950">
         <MessageList messages={messages} />
         <MessageInput onSend={sendMessage} />
       </main>

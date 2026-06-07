@@ -15,14 +15,24 @@ function formatTime(ts: number) {
 }
 
 export default function MessageList({ messages }: MessageListProps) {
+  const containerRef = useRef<HTMLDivElement>(null);
   const bottomRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    const container = containerRef.current;
+    if (!container) return;
+
+    const distanceFromBottom =
+      container.scrollHeight - container.scrollTop - container.clientHeight;
+    const isNearBottom = distanceFromBottom < 80;
+
+    if (isNearBottom) {
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }
   }, [messages]);
 
   return (
-    <div className="flex-1 overflow-y-auto px-4 py-3">
+    <div ref={containerRef} className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
       {messages.length === 0 ? (
         <p className="text-sm text-zinc-500 dark:text-zinc-400">No messages yet.</p>
       ) : (

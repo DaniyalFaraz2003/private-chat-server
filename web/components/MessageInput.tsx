@@ -26,7 +26,7 @@ export default function MessageInput({ onSend }: MessageInputProps) {
   const canSend = content.trim().length > 0;
 
   return (
-    <div className="border-t border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
+    <div className="shrink-0 border-t border-zinc-200 bg-white p-4 dark:border-zinc-800 dark:bg-zinc-950">
       <div className="flex gap-3">
         <textarea
           value={content}

@@ -24,13 +24,8 @@ export default function LoginForm() {
 
       const data = (await res.json()) as { token?: string; error?: string };
 
-      if (!res.ok) {
-        setError(data.error ?? "Login failed");
-        return;
-      }
-
-      if (!data.token) {
-        setError("Login failed");
+      if (!res.ok || !data.token) {
+        setError(data.error ?? "AUTH_FAILED");
         return;
       }
 
@@ -38,7 +33,7 @@ export default function LoginForm() {
       localStorage.setItem("chat_username", username);
       router.push("/chat");
     } catch {
-      setError("Could not reach the server");
+      setError("UPLINK_UNREACHABLE");
     } finally {
       setLoading(false);
     }
@@ -47,53 +42,60 @@ export default function LoginForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex w-full max-w-sm flex-col gap-4 rounded-xl border border-zinc-200 bg-white p-6 shadow-sm dark:border-zinc-800 dark:bg-zinc-950"
+      className="flex w-full max-w-[400px] flex-col border border-outline-variant bg-surface-container-low shadow-none"
     >
-      <div>
-        <h1 className="text-xl font-semibold text-zinc-900 dark:text-zinc-50">Private Chat</h1>
-        <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-          Sign in with your account
-        </p>
+      <div className="space-y-4 p-6">
+        <div className="space-y-1">
+          <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-on-surface-variant">
+            Username
+          </label>
+          <input
+            type="text"
+            autoComplete="username"
+            autoCapitalize="none"
+            value={username}
+            onChange={(event) => setUsername(event.target.value)}
+            placeholder="ROOT_ADMIN"
+            required
+            className="auth-input w-full border border-outline-variant bg-background px-4 py-2 font-mono text-[13px] text-primary placeholder:text-outline transition-colors"
+          />
+        </div>
+
+        <div className="space-y-1">
+          <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-on-surface-variant">
+            Password
+          </label>
+          <input
+            type="password"
+            autoComplete="current-password"
+            value={password}
+            onChange={(event) => setPassword(event.target.value)}
+            placeholder="••••••••"
+            required
+            className="auth-input w-full border border-outline-variant bg-background px-4 py-2 font-mono text-[13px] text-primary placeholder:text-outline transition-colors"
+          />
+        </div>
+
+        {error ? (
+          <p className="font-mono text-[11px] uppercase tracking-widest text-error" role="alert">
+            {error}
+          </p>
+        ) : null}
+
+        <div className="pt-2">
+          <button
+            type="submit"
+            disabled={loading || !username.trim() || !password}
+            className="flex w-full items-center justify-center border border-primary-container bg-primary-container py-4 font-bold tracking-[0.2em] text-white uppercase transition-all duration-150 hover:bg-transparent hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            <span>{loading ? "AUTHENTICATING..." : "CONNECT"}</span>
+          </button>
+        </div>
       </div>
 
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium text-zinc-700 dark:text-zinc-300">Username</span>
-        <input
-          type="text"
-          autoComplete="username"
-          autoCapitalize="none"
-          value={username}
-          onChange={(event) => setUsername(event.target.value)}
-          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-          required
-        />
-      </label>
-
-      <label className="flex flex-col gap-1 text-sm">
-        <span className="font-medium text-zinc-700 dark:text-zinc-300">Password</span>
-        <input
-          type="password"
-          autoComplete="current-password"
-          value={password}
-          onChange={(event) => setPassword(event.target.value)}
-          className="rounded-lg border border-zinc-300 bg-white px-3 py-2 text-zinc-900 outline-none focus:border-zinc-500 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-50"
-          required
-        />
-      </label>
-
-      {error ? (
-        <p className="text-sm text-red-600 dark:text-red-400" role="alert">
-          {error}
-        </p>
-      ) : null}
-
-      <button
-        type="submit"
-        disabled={loading || !username.trim() || !password}
-        className="rounded-lg bg-zinc-900 px-4 py-2 text-sm font-medium text-white transition hover:bg-zinc-700 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 dark:text-zinc-900 dark:hover:bg-zinc-300"
-      >
-        {loading ? "Signing in..." : "Sign in"}
-      </button>
+      <div className="flex h-[2px] w-full bg-outline-variant">
+        <div className="h-full w-1/3 bg-primary-container" />
+      </div>
     </form>
   );
 }
