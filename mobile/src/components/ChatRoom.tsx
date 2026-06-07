@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
   FlatList,
+  Keyboard,
   KeyboardAvoidingView,
   NativeScrollEvent,
   NativeSyntheticEvent,
@@ -12,7 +13,7 @@ import {
   View,
 } from "react-native";
 import { useRouter } from "expo-router";
-import { SafeAreaView } from "react-native-safe-area-context";
+import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { clearSession, getToken, getUsername } from "@/lib/auth-storage";
 import { theme, type as typography, fonts } from "@/lib/theme";
@@ -60,7 +61,9 @@ function systemBannerText(status: ConnectionStatus) {
 
 export default function ChatRoom() {
   const router = useRouter();
+  const insets = useSafeAreaInsets();
   const listRef = useRef<FlatList<ChatMessage>>(null);
+  const inputRef = useRef<TextInput>(null);
   const stickToBottomRef = useRef(true);
   const prevMessageCountRef = useRef(0);
 
@@ -71,6 +74,13 @@ export default function ChatRoom() {
   const [connectionStatus, setConnectionStatus] = useState<ConnectionStatus>("connecting");
   const [connectedAt, setConnectedAt] = useState<number | null>(null);
   const [uptime, setUptime] = useState("0m");
+  const [keyboardVisible, setKeyboardVisible] = useState(false);
+
+  const scrollToBottom = useCallback((animated = true) => {
+    requestAnimationFrame(() => {
+      listRef.current?.scrollToEnd({ animated });
+    });
+  }, []);
 
   useEffect(() => {
     let active = true;
@@ -155,16 +165,37 @@ export default function ChatRoom() {
   }, [connectedAt]);
 
   useEffect(() => {
+    const showEvent = Platform.OS === "ios" ? "keyboardWillShow" : "keyboardDidShow";
+    const hideEvent = Platform.OS === "ios" ? "keyboardWillHide" : "keyboardDidHide";
+
+    const showSub = Keyboard.addListener(showEvent, () => {
+      setKeyboardVisible(true);
+      if (stickToBottomRef.current) {
+        scrollToBottom(true);
+        // Second pass after keyboard animation finishes
+        setTimeout(() => scrollToBottom(true), Platform.OS === "ios" ? 250 : 100);
+      }
+    });
+
+    const hideSub = Keyboard.addListener(hideEvent, () => {
+      setKeyboardVisible(false);
+    });
+
+    return () => {
+      showSub.remove();
+      hideSub.remove();
+    };
+  }, [scrollToBottom]);
+
+  useEffect(() => {
     const isInitialLoad =
       prevMessageCountRef.current === 0 && messages.length > 0;
     prevMessageCountRef.current = messages.length;
 
     if (isInitialLoad || stickToBottomRef.current) {
-      requestAnimationFrame(() => {
-        listRef.current?.scrollToEnd({ animated: !isInitialLoad });
-      });
+      scrollToBottom(!isInitialLoad);
     }
-  }, [messages]);
+  }, [messages, scrollToBottom]);
 
   const handleScroll = useCallback(
     (event: NativeSyntheticEvent<NativeScrollEvent>) => {
@@ -195,7 +226,8 @@ export default function ChatRoom() {
       if (item.kind === "system") {
         return (
           <View style={styles.messageRow}>
-            <Text style={styles.systemLabel}>SYSTEM:</Text>
+            <Text style={styles.timestamp}>[{formatTime(item.ts)}]</Text>
+            <Text style={styles.systemTag}>&lt;system&gt;</Text>
             <Text style={styles.systemContent}>{formatSystemMessage(item.content)}</Text>
           </View>
         );
@@ -230,7 +262,7 @@ export default function ChatRoom() {
   }
 
   return (
-    <SafeAreaView style={styles.container} edges={["top", "left", "right", "bottom"]}>
+    <SafeAreaView style={styles.container} edges={["top", "left", "right"]}>
       <View style={styles.topBar}>
         <View style={styles.topBarLeft}>
           <View style={styles.metaRow}>
@@ -277,11 +309,23 @@ export default function ChatRoom() {
           onScroll={handleScroll}
           scrollEventThrottle={16}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode={Platform.OS === "ios" ? "interactive" : "on-drag"}
+          onContentSizeChange={() => {
+            if (stickToBottomRef.current) {
+              scrollToBottom(false);
+            }
+          }}
         />
 
-        <View style={styles.composer}>
+        <View
+          style={[
+            styles.composer,
+            { paddingBottom: keyboardVisible ? 8 : Math.max(insets.bottom, 8) },
+          ]}
+        >
           <View style={styles.inputRow}>
             <TextInput
+              ref={inputRef}
               value={draft}
               onChangeText={setDraft}
               placeholder="INPUT_COMMAND_OR_MESSAGE..."
@@ -289,8 +333,12 @@ export default function ChatRoom() {
               style={styles.input}
               multiline
               maxLength={2000}
-              returnKeyType="send"
+              returnKeyType="default"
               blurOnSubmit={false}
+              onFocus={() => {
+                stickToBottomRef.current = true;
+                scrollToBottom(true);
+              }}
               onSubmitEditing={handleSend}
             />
             <Pressable
@@ -444,18 +492,20 @@ const styles = StyleSheet.create({
     color: theme.onSurface,
     fontFamily: fonts.mono,
     ...typography.code,
+    flex: 1,
     flexShrink: 1,
   },
-  systemLabel: {
-    color: theme.onSurfaceVariant,
+  systemTag: {
+    color: theme.stable,
     fontFamily: fonts.mono,
-    fontStyle: "italic",
+    fontWeight: "700",
     ...typography.code,
   },
   systemContent: {
     color: theme.onSurfaceVariant,
     fontFamily: fonts.mono,
     ...typography.code,
+    flex: 1,
     flexShrink: 1,
   },
   composer: {

@@ -92,9 +92,13 @@ export default function MessageList({
             message.kind === "system" ? (
               <div
                 key={message.id}
-                className="my-xs py-sm text-primary/60 italic"
+                className="group flex gap-2 hover:bg-surface-variant/20"
               >
-                {formatSystemMessage(message.content)}
+                <span className="shrink-0 text-outline">[{formatTime(message.ts)}]</span>
+                <span className="shrink-0 font-bold text-stable">&lt;system&gt;</span>
+                <span className="min-w-0 flex-1 text-on-surface-variant">
+                  {formatSystemMessage(message.content)}
+                </span>
               </div>
             ) : (
               <div
@@ -107,7 +111,7 @@ export default function MessageList({
                 >
                   {message.from}:
                 </span>
-                <span className="text-on-surface">{message.content}</span>
+                <span className="min-w-0 flex-1 text-on-surface">{message.content}</span>
               </div>
             ),
           )

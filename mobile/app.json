@@ -13,6 +13,7 @@
     },
     "android": {
       "usesCleartextTraffic": true,
+      "softwareKeyboardLayoutMode": "resize",
       "statusBar": {
         "barStyle": "light-content",
         "backgroundColor": "#11131a"
