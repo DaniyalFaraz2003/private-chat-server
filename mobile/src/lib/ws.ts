@@ -4,16 +4,27 @@ import type { ServerMessage } from "./types";
 let ws: WebSocket | null = null;
 let reconnectToken = "";
 let reconnectHandler: ((data: ServerMessage) => void) | null = null;
+let statusHandler: ((status: ConnectionStatus) => void) | null = null;
 let shouldReconnect = true;
 
-export function connectWS(token: string, onMessage: (data: ServerMessage) => void) {
+export type ConnectionStatus = "connecting" | "connected" | "disconnected";
+
+export function connectWS(
+  token: string,
+  onMessage: (data: ServerMessage) => void,
+  onStatusChange?: (status: ConnectionStatus) => void,
+) {
   shouldReconnect = true;
   reconnectToken = token;
   reconnectHandler = onMessage;
+  statusHandler = onStatusChange ?? null;
+
+  statusHandler?.("connecting");
 
   ws = new WebSocket(`${getWsUrl()}/ws`);
 
   ws.onopen = () => {
+    statusHandler?.("connected");
     ws?.send(JSON.stringify({ type: "auth", token }));
   };
 
@@ -29,7 +40,10 @@ export function connectWS(token: string, onMessage: (data: ServerMessage) => voi
   ws.onclose = () => {
     ws = null;
     if (shouldReconnect && reconnectHandler) {
-      setTimeout(() => connectWS(reconnectToken, reconnectHandler!), 2000);
+      statusHandler?.("connecting");
+      setTimeout(() => connectWS(reconnectToken, reconnectHandler!, statusHandler ?? undefined), 2000);
+    } else {
+      statusHandler?.("disconnected");
     }
   };
 
@@ -47,6 +61,7 @@ export function sendMessage(content: string) {
 export function disconnectWS() {
   shouldReconnect = false;
   reconnectHandler = null;
+  statusHandler = null;
   ws?.close();
   ws = null;
 }
