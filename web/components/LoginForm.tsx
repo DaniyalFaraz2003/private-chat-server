@@ -46,7 +46,7 @@ export default function LoginForm() {
     >
       <div className="space-y-4 p-6">
         <div className="space-y-1">
-          <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-on-surface-variant">
+          <label className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
             Username
           </label>
           <input
@@ -57,12 +57,12 @@ export default function LoginForm() {
             onChange={(event) => setUsername(event.target.value)}
             placeholder="ROOT_ADMIN"
             required
-            className="auth-input w-full border border-outline-variant bg-background px-4 py-2 font-mono text-[13px] text-primary placeholder:text-outline transition-colors"
+            className="auth-input w-full border border-outline-variant bg-background px-4 py-2.5 font-code-md text-code-md text-primary placeholder:text-outline transition-colors"
           />
         </div>
 
         <div className="space-y-1">
-          <label className="font-mono text-[11px] font-medium uppercase tracking-widest text-on-surface-variant">
+          <label className="font-label-sm text-label-sm uppercase tracking-widest text-on-surface-variant">
             Password
           </label>
           <input
@@ -72,12 +72,12 @@ export default function LoginForm() {
             onChange={(event) => setPassword(event.target.value)}
             placeholder="••••••••"
             required
-            className="auth-input w-full border border-outline-variant bg-background px-4 py-2 font-mono text-[13px] text-primary placeholder:text-outline transition-colors"
+            className="auth-input w-full border border-outline-variant bg-background px-4 py-2.5 font-code-md text-code-md text-primary placeholder:text-outline transition-colors"
           />
         </div>
 
         {error ? (
-          <p className="font-mono text-[11px] uppercase tracking-widest text-error" role="alert">
+          <p className="font-label-sm text-label-sm uppercase tracking-widest text-error" role="alert">
             {error}
           </p>
         ) : null}
@@ -86,7 +86,7 @@ export default function LoginForm() {
           <button
             type="submit"
             disabled={loading || !username.trim() || !password}
-            className="flex w-full items-center justify-center border border-primary-container bg-primary-container py-4 font-bold tracking-[0.2em] text-white uppercase transition-all duration-150 hover:bg-transparent hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
+            className="flex w-full items-center justify-center border border-primary-container bg-primary-container py-4 font-label-sm text-label-sm font-bold tracking-[0.2em] text-white uppercase transition-all duration-150 hover:bg-transparent hover:text-primary disabled:cursor-not-allowed disabled:opacity-50"
           >
             <span>{loading ? "AUTHENTICATING..." : "CONNECT"}</span>
           </button>

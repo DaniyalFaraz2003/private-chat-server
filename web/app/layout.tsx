@@ -18,7 +18,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DEV_COMM_NULL // AUTH",
+  title: "PRIVATE CHAT SERVER",
   description: "Private real-time group chat",
 };
 
@@ -32,7 +32,7 @@ export default function RootLayout({
       lang="en"
       className={`${geistSans.variable} ${geistMono.variable} ${jetbrainsMono.variable} dark h-full antialiased`}
     >
-      <body className="min-h-full flex flex-col overflow-hidden bg-background text-on-surface">
+      <body className="flex h-full flex-col overflow-hidden bg-background text-on-surface">
         {children}
       </body>
     </html>

@@ -3,12 +3,29 @@ import type { ServerMessage } from "./types";
 
 let rws: ReconnectingWebSocket | null = null;
 
-export function connectWS(token: string, onMessage: (data: ServerMessage) => void) {
+export type ConnectionStatus = "connecting" | "connected" | "disconnected";
+
+export function connectWS(
+  token: string,
+  onMessage: (data: ServerMessage) => void,
+  onStatusChange?: (status: ConnectionStatus) => void,
+) {
   const url = `${process.env.NEXT_PUBLIC_WS_URL}/ws`;
   rws = new ReconnectingWebSocket(url);
 
+  onStatusChange?.("connecting");
+
   rws.addEventListener("open", () => {
+    onStatusChange?.("connected");
     rws?.send(JSON.stringify({ type: "auth", token }));
+  });
+
+  rws.addEventListener("close", () => {
+    if (rws) {
+      onStatusChange?.("connecting");
+    } else {
+      onStatusChange?.("disconnected");
+    }
   });
 
   rws.addEventListener("message", (event) => {

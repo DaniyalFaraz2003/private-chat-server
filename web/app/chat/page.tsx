@@ -19,8 +19,10 @@ export default function ChatPage() {
 
   if (!ready) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-zinc-50 dark:bg-black">
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">Loading chat...</p>
+      <div className="flex min-h-screen items-center justify-center bg-background">
+        <p className="font-code-md text-code-md text-on-surface-variant">
+          INITIALIZING BUFFER...
+        </p>
       </div>
     );
   }
